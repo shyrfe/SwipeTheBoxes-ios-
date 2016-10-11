@@ -11,22 +11,26 @@ import UIKit
 class ViewController: UIViewController {
 
     @IBOutlet weak var FirstButton: UIButton!
-    @IBOutlet weak var drawBox: DrawBoxView!
+    //@IBOutlet weak var drawBox: DrawBoxView!
     
-    override func viewDidLoad() {
+    var drawBox: DrawBoxView?;
+    
+    //var displayLink:CADisplayLink?
+    
+    override func viewDidLoad()
+    {
         super.viewDidLoad()
-        drawBox.update();
-        // Do any additional setup after loading the view, typically from a nib.
+        //drawBox.initWithFrame(frame: self.view.bounds);
+        drawBox = DrawBoxView(frame: self.view.bounds);
+        drawBox?.initWithFrame();
+        self.view.addSubview(drawBox!);
+        //drawBox.update();
     }
 
-    override func didReceiveMemoryWarning() {
+    override func didReceiveMemoryWarning()
+    {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-    
-    
-    
-    
 }
 

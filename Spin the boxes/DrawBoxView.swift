@@ -9,16 +9,27 @@
 import UIKit
 
 class DrawBoxView: UIView {
-
-    /*
-    // Only override draw() if you perform custom drawing.
-    // An empty implementation adversely affects performance during animation.
-    override func draw(_ rect: CGRect) {
-        // Drawing code
-    }
-    */
+    
+    
+    var displayLink:CADisplayLink?;
+    var animationRunning = false;
     
     var test = 1;
+    
+    
+    override init (frame:CGRect)
+    {
+        super.init(frame: frame);
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    public func initWithFrame()
+    {
+        displayLink = CADisplayLink(target: self, selector: #selector(CALayer.setNeedsDisplay));
+    }
     
     public func update()
     {
@@ -27,6 +38,13 @@ class DrawBoxView: UIView {
     
     override func draw(_ rect: CGRect)
     {
+        if (!animationRunning)
+        {
+            displayLink?.add(to: RunLoop.main, forMode: RunLoopMode.defaultRunLoopMode);
+            animationRunning = true;
+            return;
+        }
+        
         let context = UIGraphicsGetCurrentContext();
         
         if(test == 100)
@@ -39,9 +57,9 @@ class DrawBoxView: UIView {
         context?.addLine(to: CGPoint.init(x: 200, y: 200));
         context?.strokePath();
         
-        print("Test: /test");
+        print("Test: 1");
         test += 1;
-        
+        setNeedsDisplay();
     }
 
 }
