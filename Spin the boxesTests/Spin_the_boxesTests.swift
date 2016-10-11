@@ -9,7 +9,7 @@
 import XCTest
 @testable import Spin_the_boxes
 
-class Spin_the_boxesTests: XCTestCase {
+class Spin_the_boxesTests: XCTestCase {	
     
     override func setUp() {
         super.setUp()
