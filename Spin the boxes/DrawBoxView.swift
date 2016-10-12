@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Foundation
 
 class DrawBoxView: UIView {
     
@@ -20,20 +21,56 @@ class DrawBoxView: UIView {
     override init (frame:CGRect)
     {
         super.init(frame: frame);
+        self.backgroundColor = UIColor.white;
     }
-    
-    required init?(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder)
+    {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public func initWithFrame()
+    public func initDisplayLink()
     {
         displayLink = CADisplayLink(target: self, selector: #selector(CALayer.setNeedsDisplay));
     }
     
-    public func update()
+    
+    private func hexToUIColor(inputHex:String)->UIColor
     {
-        setNeedsDisplay();
+        var hex:String = inputHex;
+        if (hex.hasPrefix("#"))
+        {
+            hex = hex.substring(from: hex.index(hex.startIndex, offsetBy: 1));
+        }
+        
+        
+        hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int = UInt32()
+        Scanner(string: hex).scanHexInt32(&int)
+        let a, r, g, b: UInt32
+        switch hex.characters.count {
+        case 3: // RGB (12-bit)
+            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+        case 6: // RGB (24-bit)
+            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
+        case 8: // ARGB (32-bit)
+            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+        default:
+            (a, r, g, b) = (255, 0, 0, 0)
+        }
+        
+        //if (cString.characters.count != 6)
+        //{
+        //    return UIColor.gray;
+        //}
+        
+        //var red = cString.substring(to: cString.index(cString.startIndex,offsetBy: 2));
+        //var green = cString.substring(from: cString.index(cString.startIndex,offsetBy: 2)).substring(to: cString.index(cString.startIndex,offsetBy: 2));
+        //var blue = cString.substring(from: cString.index(cString.startIndex,offsetBy: 4)).substring(to: cString.index(cString.startIndex,offsetBy: 2))
+        
+        //var r:CUnsignedInt = 0, g:CUnsignedInt = 0, b:CUnsignedInt = 0;
+        
+        //Scanner.scannerWithString(red).scanHexInt32(&r);
+        return UIColor(red: CGFloat(r)/255, green: CGFloat(g)/255,blue: CGFloat(b)/255, alpha: CGFloat(a)/255);
     }
     
     override func draw(_ rect: CGRect)
@@ -47,19 +84,19 @@ class DrawBoxView: UIView {
         
         let context = UIGraphicsGetCurrentContext();
         
-        if(test == 100)
-        {
-            test = 1;
-        }
+        //context?.setFillColor(CGColor.)
+        //context?.setStrokeColor(UIColor.gray.cgColor);
+        context?.setStrokeColor(hexToUIColor(inputHex: "#BDE0EB").cgColor);
         
-        context?.setStrokeColor(UIColor.gray.cgColor);
+        
         context?.move(to:CGPoint.init(x: test, y: 0));
         context?.addLine(to: CGPoint.init(x: 200, y: 200));
+        
         context?.strokePath();
         
-        print("Test: 1");
-        test += 1;
+        
         setNeedsDisplay();
     }
-
+    
+    
 }

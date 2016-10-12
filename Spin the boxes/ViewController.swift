@@ -20,11 +20,11 @@ class ViewController: UIViewController {
     override func viewDidLoad()
     {
         super.viewDidLoad()
-        //drawBox.initWithFrame(frame: self.view.bounds);
+
         drawBox = DrawBoxView(frame: self.view.bounds);
-        drawBox?.initWithFrame();
+        drawBox?.initDisplayLink();
         self.view.addSubview(drawBox!);
-        //drawBox.update();
+        
     }
 
     override func didReceiveMemoryWarning()
