@@ -15,8 +15,6 @@ class ViewController: UIViewController {
     
     var drawBox: DrawBoxView?;
     
-    //var displayLink:CADisplayLink?
-    
     override func viewDidLoad()
     {
         super.viewDidLoad()

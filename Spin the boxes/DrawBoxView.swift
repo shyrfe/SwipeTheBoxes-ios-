@@ -33,7 +33,6 @@ class DrawBoxView: UIView {
         displayLink = CADisplayLink(target: self, selector: #selector(CALayer.setNeedsDisplay));
     }
     
-    
     private func hexToUIColor(inputHex:String)->UIColor
     {
         var hex:String = inputHex;
@@ -86,17 +85,43 @@ class DrawBoxView: UIView {
         
         //context?.setFillColor(CGColor.)
         //context?.setStrokeColor(UIColor.gray.cgColor);
-        context?.setStrokeColor(hexToUIColor(inputHex: "#BDE0EB").cgColor);
+        //context?.setStrokeColor(hexToUIColor(inputHex: "#BDE0EB").cgColor);
         
-        
-        context?.move(to:CGPoint.init(x: test, y: 0));
-        context?.addLine(to: CGPoint.init(x: 200, y: 200));
+        parseBox(box: Box.init(_x:40,_y:40,_width:50,_height:50
+            ,_color:hexToUIColor(inputHex: "#BDE0EB"),_number:0), context: context!);
+        //context?.move(to:CGPoint.init(x: test, y: 0));
+        //context?.addLine(to: CGPoint.init(x: 200, y: 200));
         
         context?.strokePath();
-        
         
         setNeedsDisplay();
     }
     
-    
+    func parseBox(box:Box,context:CGContext)
+    {
+        let boxWidth = box.getWidth();
+        let boxHeight = box.getHeight();
+        
+        
+        let rect = CGRect(x: box.getX(), y: box.getY(), width: boxWidth, height: boxHeight);
+        context.setFillColor(box.getColor().cgColor);
+        context.fill(rect);
+        
+        context.setStrokeColor(UIColor.black.cgColor);
+        //context.setLineWidth(CGFloat.init(integerLiteral: 2));
+        context.stroke(rect, width: CGFloat.init(integerLiteral: 1));
+        
+        let fontSize:CGFloat = 9.0;
+        let text:NSString = NSString.localizedStringWithFormat("%d", box.getNumber());
+        let font = UIFont(name:"Helvetica",size: fontSize);
+        let textRect: CGRect = CGRect.init(x: box.getX(), y: box.getY()+(boxHeight/2)-Int(fontSize)/2, width: boxWidth, height: boxHeight);
+        let paragraph = NSMutableParagraphStyle();
+        paragraph.alignment = .center;
+        let textFontAttributes = [NSFontAttributeName: font!, NSParagraphStyleAttributeName: paragraph];
+        text.draw(in: textRect, withAttributes: textFontAttributes);
+        
+        
+        //context.setFont(CGFont.init("Helvetica" as CFString)!);
+        
+    }
 }

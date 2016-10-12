@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 class Box
 {
@@ -14,12 +15,15 @@ class Box
     private var mX:NSInteger;
     private var mWidth:NSInteger;
     private var mHeight:NSInteger;
-    private var mColor:NSInteger;
+    private var mColor:UIColor;
     private var mNumber:NSInteger;
+    
     
     public var Force = 0;
     
-    init(_x:NSInteger, _y:NSInteger, _width:NSInteger, _height:NSInteger, _color:NSInteger, _number:NSInteger)
+    
+    
+    init(_x:NSInteger, _y:NSInteger, _width:NSInteger, _height:NSInteger, _color:UIColor, _number:NSInteger)
     {
         mX = _x;
         mY = _y;
@@ -29,21 +33,21 @@ class Box
         mNumber = _number;
         
     }
-    convenience init(_x:NSInteger, _y:NSInteger, _width:NSInteger, _height:NSInteger, _color:NSInteger)
+    convenience init(_x:NSInteger, _y:NSInteger, _width:NSInteger, _height:NSInteger, _color:UIColor)
     {
         self.init(_x: _x,_y: _y,_width: _width,_height: _height,_color: _color,_number: 0);
     }
     convenience init(_x:NSInteger, _y:NSInteger, _width:NSInteger, _height:NSInteger)
     {
-        self.init(_x:_x,_y:_y,_width:_width,_height:_height,_color: 0,_number: 0);
+        self.init(_x:_x,_y:_y,_width:_width,_height:_height,_color: UIColor.gray,_number: 0);
     }
     convenience init(_x:NSInteger, _y:NSInteger)
     {
-        self.init(_x:_x,_y:_y,_width:0,_height:0,_color: 0,_number: 0)
+        self.init(_x:_x,_y:_y,_width:0,_height:0,_color: UIColor.gray,_number: 0)
     }
     convenience init()
     {
-        self.init(_x:0,_y:0,_width:0,_height:0,_color: 0,_number: 0)
+        self.init(_x:0,_y:0,_width:0,_height:0,_color: UIColor.gray,_number: 0)
     }
     
     func setX(_x:Int)
@@ -62,7 +66,7 @@ class Box
     {
         mHeight=_height;
     }
-    func setColor(_color:Int)
+    func setColor(_color:UIColor)
     {
         mColor = _color;
     }
@@ -87,7 +91,7 @@ class Box
     {
         return mHeight;
     }
-    func getColor()->Int
+    func getColor()->UIColor
     {
         return mColor;
     }
