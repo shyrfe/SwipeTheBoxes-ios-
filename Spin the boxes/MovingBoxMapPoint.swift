@@ -13,10 +13,10 @@ class MovingBoxMapPoint
     public var x:Int;
     public var y:Int;
     
-    public var NextPoint:MovingBoxMapPoint;
-    public var LastPoint:MovingBoxMapPoint;
+    public var NextPoint:MovingBoxMapPoint?;
+    public var LastPoint:MovingBoxMapPoint?;
     
-    init(_x:Int,_y:Int,_nextPoint:MovingBoxMapPoint,_lastPoint:MovingBoxMapPoint)
+    init(_x:Int,_y:Int,_nextPoint:MovingBoxMapPoint?,_lastPoint:MovingBoxMapPoint?)
     {
         x = _x;
         y = _y;

@@ -13,6 +13,7 @@
 		AC155B141DAC371E00009F1C /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC155B131DAC371E00009F1C /* OpenGLES.framework */; };
 		AC155B161DAC378B00009F1C /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC155B151DAC378B00009F1C /* QuartzCore.framework */; };
 		AC155B181DAC3FF000009F1C /* DrawBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC155B171DAC3FF000009F1C /* DrawBoxView.swift */; };
+		AC1CE5E61DAEDDD000232819 /* BoxController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1CE5E51DAEDDD000232819 /* BoxController.swift */; };
 		ACCFBD8E1DA7A63B001A1015 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFBD8D1DA7A63B001A1015 /* AppDelegate.swift */; };
 		ACCFBD901DA7A63B001A1015 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACCFBD8F1DA7A63B001A1015 /* ViewController.swift */; };
 		ACCFBD931DA7A63B001A1015 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ACCFBD911DA7A63B001A1015 /* Main.storyboard */; };
@@ -46,6 +47,7 @@
 		AC155B131DAC371E00009F1C /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		AC155B151DAC378B00009F1C /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		AC155B171DAC3FF000009F1C /* DrawBoxView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DrawBoxView.swift; sourceTree = "<group>"; };
+		AC1CE5E51DAEDDD000232819 /* BoxController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BoxController.swift; sourceTree = "<group>"; };
 		ACCFBD8A1DA7A63B001A1015 /* Spin the boxes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Spin the boxes.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACCFBD8D1DA7A63B001A1015 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		ACCFBD8F1DA7A63B001A1015 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -131,6 +133,7 @@
 				AC155B0E1DAC2A2000009F1C /* MovingBox.swift */,
 				AC155B101DAC2C6E00009F1C /* MovingBoxMapPoint.swift */,
 				AC155B171DAC3FF000009F1C /* DrawBoxView.swift */,
+				AC1CE5E51DAEDDD000232819 /* BoxController.swift */,
 			);
 			path = "Spin the boxes";
 			sourceTree = "<group>";
@@ -289,6 +292,7 @@
 			files = (
 				AC155B0D1DAC158500009F1C /* Box.swift in Sources */,
 				ACCFBD901DA7A63B001A1015 /* ViewController.swift in Sources */,
+				AC1CE5E61DAEDDD000232819 /* BoxController.swift in Sources */,
 				AC155B181DAC3FF000009F1C /* DrawBoxView.swift in Sources */,
 				ACCFBD8E1DA7A63B001A1015 /* AppDelegate.swift in Sources */,
 				AC155B0F1DAC2A2000009F1C /* MovingBox.swift in Sources */,

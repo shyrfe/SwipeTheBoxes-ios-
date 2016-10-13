@@ -11,11 +11,12 @@ import Foundation
 
 class DrawBoxView: UIView {
     
+    public var ScreenWidth:Int?;
+    public var ScreenHeight:Int?;
+    public var LocalBoxController:BoxController?;
     
-    var displayLink:CADisplayLink?;
-    var animationRunning = false;
-    
-    var test = 1;
+    private var displayLink:CADisplayLink?;
+    private var animationRunning = false;
     
     
     override init (frame:CGRect)
@@ -33,14 +34,13 @@ class DrawBoxView: UIView {
         displayLink = CADisplayLink(target: self, selector: #selector(CALayer.setNeedsDisplay));
     }
     
-    private func hexToUIColor(inputHex:String)->UIColor
+    public func hexToUIColor(inputHex:String)->UIColor
     {
         var hex:String = inputHex;
         if (hex.hasPrefix("#"))
         {
             hex = hex.substring(from: hex.index(hex.startIndex, offsetBy: 1));
         }
-        
         
         hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int = UInt32()
@@ -83,12 +83,33 @@ class DrawBoxView: UIView {
         
         let context = UIGraphicsGetCurrentContext();
         
+        
+        if ((ScreenWidth == nil) || (ScreenHeight == nil))
+        {
+            ScreenWidth = context?.width;
+            ScreenHeight = context?.height;
+            
+            print("Width: " + String.init(describing: ScreenWidth));
+            print("Height: " + String.init(describing: ScreenHeight));
+        }
+        
+        if (LocalBoxController != nil)
+        {
+            for i in 0 ... (LocalBoxController?.BoxPool.count)! - 1
+            {
+                parseBox(box: (LocalBoxController?.BoxPool[i])!, context: context!);
+            }
+            
+            //parseBox(box: Box.init(_x:40,_y:40,_width:50,_height:50,_color:hexToUIColor(inputHex: "#BDE0EB"),_number:0), context: context!);
+        }
+        //print(String.init(describing: context?.width));
+        //print(String.init(describing: context?.height));
+        
         //context?.setFillColor(CGColor.)
         //context?.setStrokeColor(UIColor.gray.cgColor);
         //context?.setStrokeColor(hexToUIColor(inputHex: "#BDE0EB").cgColor);
         
-        parseBox(box: Box.init(_x:40,_y:40,_width:50,_height:50
-            ,_color:hexToUIColor(inputHex: "#BDE0EB"),_number:0), context: context!);
+        
         //context?.move(to:CGPoint.init(x: test, y: 0));
         //context?.addLine(to: CGPoint.init(x: 200, y: 200));
         
@@ -101,7 +122,6 @@ class DrawBoxView: UIView {
     {
         let boxWidth = box.getWidth();
         let boxHeight = box.getHeight();
-        
         
         let rect = CGRect(x: box.getX(), y: box.getY(), width: boxWidth, height: boxHeight);
         context.setFillColor(box.getColor().cgColor);
@@ -120,8 +140,6 @@ class DrawBoxView: UIView {
         let textFontAttributes = [NSFontAttributeName: font!, NSParagraphStyleAttributeName: paragraph];
         text.draw(in: textRect, withAttributes: textFontAttributes);
         
-        
         //context.setFont(CGFont.init("Helvetica" as CFString)!);
-        
     }
 }

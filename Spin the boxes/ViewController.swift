@@ -14,6 +14,8 @@ class ViewController: UIViewController {
     //@IBOutlet weak var drawBox: DrawBoxView!
     
     var drawBox: DrawBoxView?;
+    private var mBoxController:BoxController?;
+    
     
     override func viewDidLoad()
     {
@@ -22,6 +24,8 @@ class ViewController: UIViewController {
         drawBox = DrawBoxView(frame: self.view.bounds);
         drawBox?.initDisplayLink();
         self.view.addSubview(drawBox!);
+        
+        mBoxController = BoxController(_drawBoxView: drawBox!);
         
     }
 
