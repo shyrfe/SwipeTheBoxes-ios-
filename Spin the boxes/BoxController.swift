@@ -14,8 +14,11 @@ class BoxController
     public static let INPUT_TYPE_LONGPRESS_START = "LongPressStart";
     public static let INPUT_TYPE_LONGPRESS_END = "LongPressEnd";
     public static let INPUT_TYPE_TAP = "Tap";
-    public static let INPUT_TYPE_SWIPE = "Swipe";
+    //public static let INPUT_TYPE_SWIPE = "Swipe";
     public static let INPUT_TYPE_PAN = "Pan";
+    public static let INPUT_TYPE_TOUCH_BEGAN = "TouchBegan";
+    public static let INPUT_TYPE_TOUCH_ENDED = "TouchEnded";
+    public static let INPUT_TYPE_TOUCH_MOVED = "TouchMoved";
     
     public var BoxPool = [Box]();
     public var MovingBoxPool = [MovingBox]();
@@ -173,12 +176,12 @@ class BoxController
         mBoxYDistance = (MovingBoxPool[0].LastBox?.getY())! - (MovingBoxPool[0].getY());
     }
     
-    func input(_value:String,_recognizer:UIGestureRecognizer)
+    func input(_value:String,_recognizer:UIGestureRecognizer?)
     {
         switch _value {
         case "LongPressStart":
             print("LongPressStart");
-            print("X: " + String.init(describing: _recognizer.location(in: _recognizer.view).x));
+            //print("X: " + String.init(describing: _recognizer.location(in: _recognizer.view).x));
             break;
         case "LongPressEnd":
             print("LongPressEnd")
@@ -186,15 +189,107 @@ class BoxController
         case "Tap":
             print("Tap")
             break;
-        case "Swipe":
-            print("Swipe")
-            break;
+        //case "Swipe":
+            //print("Swipe")
+            //break;
         case "Pan":
-            print("Pan")
+            panInput(_recognizer: _recognizer as! UIPanGestureRecognizer);
+            //print("Pan")
+            break;
+        case "TouchBegan":
+            print("TouchBegan");
+            break;
+        case "TouchEnded":
+            break;
+        case "TouchMoved":
             break;
         default:
             break;
         }
     }
-    
+    private func panInput(_recognizer:UIPanGestureRecognizer)
+    {
+        let panVelocity = _recognizer.velocity(in: _recognizer.view);
+        
+        if ((abs(panVelocity.x) > 1500)||(abs(panVelocity.y) > 1500))
+        {
+            print("Swipe");
+        }
+        else
+        {
+            MoveRight();
+            print("Pan");
+        }
+    }
+    private func MoveRight()
+    {
+        let step = 1;
+        for i in stride(from: 0, to: MovingBoxPool.count, by: 1)
+        {
+            let x = MovingBoxPool[i].getX();
+            let y = MovingBoxPool[i].getY();
+            
+            if(x < mMaxX! && y == mMinY!)
+            {
+                MovingBoxPool[i].setX(_x: MovingBoxPool[i].getX() + step);
+            }
+            else if (x > mMinX! && y == mMaxY!)
+            {
+                MovingBoxPool[i].setX(_x: MovingBoxPool[i].getX() - step);
+            }
+            else if (x == mMaxX! && y < mMaxY!)
+            {
+                MovingBoxPool[i].setY(_y: MovingBoxPool[i].getY() + step);
+                
+                if(MovingBoxPool[i].NextBox?.getX() != MovingBoxPool[i].getX())
+                {
+                    if ((mMaxY! - MovingBoxPool[i].getY())+(mMaxX! - (MovingBoxPool[i].NextBox?.getX())!) > mBoxXDistance!)
+                    {
+                        MovingBoxPool[i].setY(_y: MovingBoxPool[i].getY() + step);
+                    }
+                }
+                else if (MovingBoxPool[i].NextBox?.getX() == MovingBoxPool[i].getX())
+                {
+                    if ((MovingBoxPool[i].NextBox?.getY())! - MovingBoxPool[i].getY() > mBoxYDistance!)
+                    {
+                        MovingBoxPool[i].setY(_y: MovingBoxPool[i].getY()+step);
+                    }
+                }
+            }
+            else if (x == mMinX && y > mMinY!)
+            {
+                MovingBoxPool[i].setY(_y: MovingBoxPool[i].getY() - step);
+                
+                if(MovingBoxPool[i].NextBox?.getX() != MovingBoxPool[i].getX())
+                {
+                    if (((MovingBoxPool[i].NextBox?.getX())! - mMinX!) + (MovingBoxPool[i].getY() - mMinY!) > mBoxXDistance!)
+                    {
+                        MovingBoxPool[i].setY(_y: MovingBoxPool[i].getY() - step);
+                    }
+                }
+                else if (MovingBoxPool[i].NextBox?.getX() == MovingBoxPool[i].getX())
+                {
+                    if (MovingBoxPool[i].getY() - (MovingBoxPool[i].NextBox?.getY())! > mBoxYDistance!)
+                    {
+                        MovingBoxPool[i].setY(_y: MovingBoxPool[i].getY() - step);
+                    }
+                }
+            }
+            
+            if((MovingBoxPool[i].getX() == MovingBoxPool[i].ThisPoint?.NextPoint?.x)&&(MovingBoxPool[i].getY() == (MovingBoxPool[i].ThisPoint?.NextPoint?.y)!))
+            {
+                for j in stride(from: 0, to: MovingBoxPool.count, by: 1)
+                {
+                    if(j != 4)
+                    {
+                        MovingBoxPool[j].ThisPoint = MovingBoxPool[j].ThisPoint?.NextPoint;
+                    }
+                }
+            }
+        }
+    }
+    private func MoveLeft()
+    {
+        
+    }
 }
