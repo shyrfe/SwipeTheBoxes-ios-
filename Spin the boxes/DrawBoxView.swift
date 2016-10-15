@@ -18,11 +18,17 @@ class DrawBoxView: UIView {
     private var displayLink:CADisplayLink?;
     private var animationRunning = false;
     
+//    @IBAction func longPressed(sender: UILongPressGestureRecognizer)
+//    {
+//        print("long press");
+//        
+//    }
     
     override init (frame:CGRect)
     {
         super.init(frame: frame);
         self.backgroundColor = UIColor.white;
+        //super.view
     }
     required init?(coder aDecoder: NSCoder)
     {
@@ -95,7 +101,8 @@ class DrawBoxView: UIView {
         
         if (LocalBoxController != nil)
         {
-            for i in 0 ... (LocalBoxController?.BoxPool.count)! - 1
+            //for i in 0...(LocalBoxController?.BoxPool.count)! - 1
+            for i in stride(from: 0, to: (LocalBoxController?.BoxPool.count)!, by: 1)
             {
                 parseBox(box: (LocalBoxController?.BoxPool[i])!, context: context!);
             }
@@ -120,10 +127,20 @@ class DrawBoxView: UIView {
     
     func parseBox(box:Box,context:CGContext)
     {
+        var displayScale = 1;
+        if ((UIScreen.main.scale == 2.0)&&(UIScreen.main.responds(to: #selector(NSDecimalNumberBehaviors.scale))))
+        {
+            displayScale = 2;
+        }
+        else
+        {
+            displayScale = 1;
+        }
+        
         let boxWidth = box.getWidth();
         let boxHeight = box.getHeight();
         
-        let rect = CGRect(x: box.getX(), y: box.getY(), width: boxWidth, height: boxHeight);
+        let rect = CGRect(x: box.getX()/displayScale, y: box.getY() / displayScale, width: boxWidth / displayScale, height: boxHeight / displayScale);
         context.setFillColor(box.getColor().cgColor);
         context.fill(rect);
         
@@ -134,11 +151,12 @@ class DrawBoxView: UIView {
         let fontSize:CGFloat = 9.0;
         let text:NSString = NSString.localizedStringWithFormat("%d", box.getNumber());
         let font = UIFont(name:"Helvetica",size: fontSize);
-        let textRect: CGRect = CGRect.init(x: box.getX(), y: box.getY()+(boxHeight/2)-Int(fontSize)/2, width: boxWidth, height: boxHeight);
+        let textRect: CGRect = CGRect.init(x: box.getX() / displayScale, y: (box.getY() / displayScale)+((boxHeight/displayScale)/2)-Int(fontSize)/2, width: boxWidth / displayScale, height: boxHeight / displayScale);
         let paragraph = NSMutableParagraphStyle();
         paragraph.alignment = .center;
         let textFontAttributes = [NSFontAttributeName: font!, NSParagraphStyleAttributeName: paragraph];
         text.draw(in: textRect, withAttributes: textFontAttributes);
+        
         
         //context.setFont(CGFont.init("Helvetica" as CFString)!);
     }

@@ -11,6 +11,12 @@ import UIKit
 
 class BoxController
 {
+    public static let INPUT_TYPE_LONGPRESS_START = "LongPressStart";
+    public static let INPUT_TYPE_LONGPRESS_END = "LongPressEnd";
+    public static let INPUT_TYPE_TAP = "Tap";
+    public static let INPUT_TYPE_SWIPE = "Swipe";
+    public static let INPUT_TYPE_PAN = "Pan";
+    
     public var BoxPool = [Box]();
     public var MovingBoxPool = [MovingBox]();
     
@@ -27,16 +33,17 @@ class BoxController
     private var mBoxXDistance:Int?;
     private var mBoxYDistance:Int?;
     
+    
+    
     let mDrawBoxView:DrawBoxView;
+    
     
     init(_drawBoxView:DrawBoxView)
     {
         mDrawBoxView = _drawBoxView;
-        
-        
+
         let thread = Thread(target: self, selector: #selector(boxsInit), object: nil);
         thread.start();
-        //boxsInit()
     }
     
     @objc func boxsInit()
@@ -164,6 +171,30 @@ class BoxController
         
         mBoxXDistance = (MovingBoxPool[0].NextBox?.getX())! - (MovingBoxPool[0].getX());
         mBoxYDistance = (MovingBoxPool[0].LastBox?.getY())! - (MovingBoxPool[0].getY());
+    }
+    
+    func input(_value:String,_recognizer:UIGestureRecognizer)
+    {
+        switch _value {
+        case "LongPressStart":
+            print("LongPressStart");
+            print("X: " + String.init(describing: _recognizer.location(in: _recognizer.view).x));
+            break;
+        case "LongPressEnd":
+            print("LongPressEnd")
+            break;
+        case "Tap":
+            print("Tap")
+            break;
+        case "Swipe":
+            print("Swipe")
+            break;
+        case "Pan":
+            print("Pan")
+            break;
+        default:
+            break;
+        }
     }
     
 }
