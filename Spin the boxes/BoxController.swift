@@ -273,7 +273,7 @@ class BoxController
         let forceY = Int(panVelocity.y) / 10;
         
         
-        if ((abs(panVelocity.x) > 800)||(abs(panVelocity.y) > 800)) // swipe
+        if ((abs(panVelocity.x) > 900)||(abs(panVelocity.y) > 900)) // swipe
         {
             if(abs(Int(_recognizer.translation(in: _recognizer.view).x)) > SWIPE_THRESHOLD)
             {
@@ -366,7 +366,7 @@ class BoxController
     }
     private func syncPosition()
     {
-        if (abs(mForce) < mForceStep && !mScrollRun)
+        if (abs(mForce) <= mForceStep && !mScrollRun)
         {
             mForce = 0;
             var dir = 0;
@@ -514,7 +514,7 @@ class BoxController
                     }
                 }
             }
-            else if (abs(X) < abs(Y))
+            else //if (abs(X) < abs(Y))
             {
                 if((LocalBox?.getX())! < mScreenWidth!/2)
                 {
