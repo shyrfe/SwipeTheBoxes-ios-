@@ -101,6 +101,7 @@ class DrawBoxView: UIView {
         
         if (LocalBoxController != nil)
         {
+            LocalBoxController?.animationUpdate();
             //for i in 0...(LocalBoxController?.BoxPool.count)! - 1
             for i in stride(from: 0, to: (LocalBoxController?.BoxPool.count)!, by: 1)
             {

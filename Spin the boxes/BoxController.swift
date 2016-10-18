@@ -23,6 +23,14 @@ class BoxController
     public var BoxPool = [Box]();
     public var MovingBoxPool = [MovingBox]();
     
+    private var mLastTime = Date().timeIntervalSince1970;
+    private var mForce = 0;
+    private var mForceFinished = true;
+    private var mScrollRun = false;
+    private var mForceStep = 0;
+    private var mForceStepNumber = 0;
+    private var mForceNumberOfSteps = 9;
+    
     private var mScreenWidth:Int?;
     private var mScreenHeight:Int?;
     private let BOX_WIDTH_NUMBER = 3;
@@ -36,6 +44,8 @@ class BoxController
     private var mBoxXDistance:Int?;
     private var mBoxYDistance:Int?;
     
+    private var mFirstTouchPositionX = 0;
+    private var mFirstTouchPositionY = 0;
     
     
     let mDrawBoxView:DrawBoxView;
@@ -113,7 +123,6 @@ class BoxController
         movingBoxPoolInit(_boxPool: BoxPool);
         //poolChanged();
     }
-    
     func movingBoxPoolInit(_boxPool:[Box])
     {
         for i in 0 ... _boxPool.count - 1
@@ -181,6 +190,7 @@ class BoxController
         switch _value {
         case "LongPressStart":
             print("LongPressStart");
+            longPressStartInput(_recognizer: _recognizer as! UILongPressGestureRecognizer);
             //print("X: " + String.init(describing: _recognizer.location(in: _recognizer.view).x));
             break;
         case "LongPressEnd":
@@ -198,8 +208,13 @@ class BoxController
             break;
         case "TouchBegan":
             print("TouchBegan");
+            mForce = 0;
+            mForceFinished = true;
+            mScrollRun = true;
             break;
         case "TouchEnded":
+            print("TouchEnded");
+            mScrollRun = false;
             break;
         case "TouchMoved":
             break;
@@ -207,19 +222,355 @@ class BoxController
             break;
         }
     }
+    private func longPressStartInput(_recognizer:UILongPressGestureRecognizer)
+    {
+        var localBox:Box?;
+        localBox = findBox(_x: Int(_recognizer.location(in: _recognizer.view).x), _y: Int(_recognizer.location(in: _recognizer.view).y));
+        if (localBox != nil)
+        {
+            print("LongPress Start #" + String.init(describing: localBox?.getNumber()));
+        }
+        else
+        {
+            print("Box not found");
+        }
+        
+    }
     private func panInput(_recognizer:UIPanGestureRecognizer)
     {
         let panVelocity = _recognizer.velocity(in: _recognizer.view);
         
-        if ((abs(panVelocity.x) > 1500)||(abs(panVelocity.y) > 1500))
+        var displayScale = 1;
+        if ((UIScreen.main.scale == 2.0)&&(UIScreen.main.responds(to: #selector(NSDecimalNumberBehaviors.scale))))
         {
-            print("Swipe");
+            displayScale = 2;
         }
         else
         {
-            MoveRight();
-            print("Pan");
+            displayScale = 1;
         }
+        
+        //print("VelX: " + String.init(describing: panVelocity.x));
+        //print("VelY: " + String.init(describing: panVelocity.y));
+        
+        let X = Int(floor(_recognizer.location(in: _recognizer.view).x));// * displayScale;
+        let Y = Int(floor(_recognizer.location(in: _recognizer.view).y));// * displayScale;
+        
+        
+        if ((abs(panVelocity.x) > 2000)||(abs(panVelocity.y) > 2000))
+        {
+            print("Swipe");
+            
+        }
+        else
+        {
+            var distanceX = 0;//Int(floor(_recognizer.translation(in: _recognizer.view).x)) / displayScale;
+            var distanceY = 0;//Int(floor(_recognizer.translation(in: _recognizer.view).y)) / displayScale;
+            if (_recognizer.state == .began)
+            {
+                mFirstTouchPositionX = X * displayScale;
+                mFirstTouchPositionY = Y * displayScale;
+                //distanceY = 0;
+                //distanceX = 0;
+            }
+            else if (_recognizer.state == .changed)
+            {
+                distanceX = Int(floor(_recognizer.location(in: _recognizer.view).x)) * displayScale - mFirstTouchPositionX;
+                distanceY = Int(floor(_recognizer.location(in: _recognizer.view).y)) * displayScale - mFirstTouchPositionY;
+                mFirstTouchPositionX = Int(floor(_recognizer.location(in: _recognizer.view).x)) * displayScale;
+                mFirstTouchPositionY = Int(floor(_recognizer.location(in: _recognizer.view).y)) * displayScale;
+            }
+            
+            
+            MoveTo(_box: findBox(_x: X, _y: Y), _distX: distanceX, _distY: distanceY);
+//            if (abs(panVelocity.x) > abs(panVelocity.y))
+//            {
+//                if (panVelocity.x > 0)
+//                {
+//                    if(Y < mScreenHeight!/2)
+//                    {
+//                        print("Y < H/2")
+//                        MoveTo(_box: findBox(_x: X, _y: Y), _distX: distanceX, _distY: distanceY);
+//                    }
+//                    else
+//                    {
+//                        print("Y > H/2")
+//                        MoveTo(_box: findBox(_x: X, _y: Y), _distX: distanceX, _distY: distanceY);
+//                    }
+//                }
+//                else
+//                {
+//                    if(Y > mScreenHeight!/2)
+//                    {
+//                        MoveTo(_box: findBox(_x: X, _y: Y), _distX: distanceX, _distY: distanceY);
+//                    }
+//                    else
+//                    {
+//                        MoveTo(_box: findBox(_x: X, _y: Y), _distX: distanceX, _distY: distanceY)
+//                    }
+//                }
+//            }
+//            else
+//            {
+//                if (panVelocity.y > 0)
+//                {
+//                    if(X > mScreenWidth!/2)
+//                    {
+//                        MoveTo(_box: findBox(_x: X, _y: Y), _distX: distanceX, _distY: distanceY);
+//                    }
+//                    else
+//                    {
+//                        MoveTo(_box: findBox(_x: X, _y: Y), _distX: distanceX, _distY: distanceY);
+//                    }
+//                }
+//                else
+//                {
+//                    if(X < mScreenWidth!/2)
+//                    {
+//                        MoveTo(_box: findBox(_x: X, _y: Y), _distX: distanceX, _distY: distanceY);
+//                    }
+//                    else
+//                    {
+//                        MoveTo(_box: findBox(_x: X, _y: Y), _distX: distanceX, _distY: distanceY);
+//                    }
+//                }
+//            }
+            //MoveWithForce(_force: 1000);
+            //MoveRight();
+            //MoveLeft();
+            //print("Pan");
+        }
+    }
+    
+    func animationUpdate()
+    {
+        if (mLastTime == 0)
+        {
+            mLastTime = Date().timeIntervalSince1970;
+        }
+        
+        let time = Date().timeIntervalSince1970;
+        let dTime = (time - mLastTime);
+        
+//        for _ in 0...30
+//        {
+//            MoveLeft();
+//            MoveRight();
+//            MoveLeft();
+//            MoveRight();
+//            MoveRight();
+//        }
+        if (dTime >= 1/60)
+        {
+            forceMove();
+            syncPosition();
+            mLastTime = time;
+        }
+    }
+    
+    private func MoveWithForce(_force:Int)
+    {
+        mForce = _force;
+        mForceStepNumber = mForceNumberOfSteps;
+        mForceStep = abs(mForce)/mForceNumberOfSteps;
+        mForceFinished = false;
+        
+    }
+    private func syncPosition()
+    {
+        if (abs(mForce) < 100 && !mScrollRun)
+        {
+            mForce = 0;
+            var dir = 0;
+            
+            for i in stride(from: 0, to: MovingBoxPool.count, by: 1)
+            {
+                if(MovingBoxPool[i].ThisPoint?.x == mMinX && (MovingBoxPool[i].ThisPoint?.y)! == mMinY!)
+                {
+                    if((((MovingBoxPool[i].ThisPoint?.NextPoint?.x)! - MovingBoxPool[i].getX()) < (((MovingBoxPool[i].ThisPoint?.NextPoint?.x)! - (MovingBoxPool[i].ThisPoint?.x)!)/2)) && ((MovingBoxPool[i].ThisPoint?.y)! == (MovingBoxPool[i].ThisPoint?.NextPoint?.y)!))
+                    {
+                        dir = 1;
+                        break;
+                    }
+                    else if ((((MovingBoxPool[i].ThisPoint?.LastPoint?.y)! - MovingBoxPool[i].getY()) < (((MovingBoxPool[i].ThisPoint?.LastPoint?.y)! - (MovingBoxPool[i].ThisPoint?.y)!)/2)) && ((MovingBoxPool[i].ThisPoint?.x)! == (MovingBoxPool[i].ThisPoint?.LastPoint?.x)!))
+                    {
+                        dir = -1;
+                        break;
+                    }
+                }
+            }
+            if(dir == 1)
+            {
+                for i in stride(from: 0, to: MovingBoxPool.count, by: 1)
+                {
+                    if(i != 4)
+                    {
+                        MovingBoxPool[i].ThisPoint = MovingBoxPool[i].ThisPoint?.NextPoint;
+                    }
+                }
+            }
+            else if (dir == -1)
+            {
+                for i in stride(from: 0, to: MovingBoxPool.count, by: 1)
+                {
+                    if (i != 4)
+                    {
+                        MovingBoxPool[i].ThisPoint = MovingBoxPool[i].ThisPoint?.LastPoint;
+                    }
+                }
+            }
+            
+            for i in stride(from: 0, to: MovingBoxPool.count, by: 1)
+            {
+                var LocalBox:MovingBox?;
+                   LocalBox = MovingBoxPool[i];
+                
+                if((LocalBox?.getX() != LocalBox?.ThisPoint?.x) || (LocalBox?.getY() != LocalBox?.ThisPoint?.y))
+                {
+                    if((LocalBox?.getX())! > (LocalBox?.ThisPoint?.x)!)
+                    {
+                        LocalBox?.setX(_x: (LocalBox?.getX())! - 1);
+                    }
+                    else if ((LocalBox?.getX())! < (LocalBox?.ThisPoint?.x)!)
+                    {
+                        LocalBox?.setX(_x: (LocalBox?.getX())! + 1);
+                    }
+                    
+                    if((LocalBox?.getY())! > (LocalBox?.ThisPoint?.y)!)
+                    {
+                        LocalBox?.setY(_y: (LocalBox?.getY())! - 1);
+                    }
+                    else if ((LocalBox?.getY())! < (LocalBox?.ThisPoint?.y)!)
+                    {
+                        LocalBox?.setY(_y: (LocalBox?.getY())! + 1);
+                    }
+                }
+            }
+        }
+    }
+    private func findBox(_x:Int,_y:Int) -> Box?
+    {
+        var displayScale = 1;
+        if ((UIScreen.main.scale == 2.0)&&(UIScreen.main.responds(to: #selector(NSDecimalNumberBehaviors.scale))))
+        {
+            displayScale = 2;
+        }
+        else
+        {
+            displayScale = 1;
+        }
+        
+        let X = _x * displayScale;
+        let Y = _y * displayScale;
+        
+        for i in stride(from: 0, to: BoxPool.count, by: 1)
+        {
+            var localBox:Box?;
+            localBox = BoxPool[i];
+            
+            if(((localBox?.getX())! <= X) && (X <= ((localBox?.getX())! + (localBox?.getWidth())!)) && ((localBox?.getY())! <= Y) && (Y <= ((localBox?.getY())! + (localBox?.getHeight())!)))
+            {
+                return localBox;
+            }
+        }
+        return nil;
+    }
+    
+    
+    private func MoveTo(_box:Box?,_distX:Int,_distY:Int)
+    {
+        let X = _distX;
+        let Y = _distY;
+        
+        print("DistX" + String.init(X));
+        print("DistY" + String.init(Y));
+        var LocalBox:Box?;
+        LocalBox = _box;
+        
+        if(LocalBox != nil)
+        {
+            if(abs(X) > abs(Y))
+            {
+                if((LocalBox?.getY())! < mScreenHeight!/2)
+                {
+                    if(X < 0)
+                    {
+                        for _ in stride(from: 0, to: (X * -1), by: 1)
+                        {
+                            MoveLeft();
+                            
+                        }
+                    }
+                    else if (X > 0)
+                    {
+                        for _ in stride(from: 0, to: X, by: 1)
+                        {
+                            MoveRight();
+                        }
+                    }
+                }
+                else
+                {
+                    if(X < 0)
+                    {
+                        for _ in stride(from: 0, to: (X * -1), by: 1)
+                        {
+                            MoveRight();
+                        }
+                    }
+                    else if (X > 0)
+                    {
+                        for _ in stride(from: 0, to: X, by: 1)
+                        {
+                            MoveLeft();
+                            
+                        }
+                    }
+                }
+            }
+            else if (abs(X) < abs(Y))
+            {
+                if((LocalBox?.getX())! < mScreenWidth!/2)
+                {
+                    if(Y < 0)
+                    {
+                        for _ in stride(from: 0, to: (Y * -1), by: 1)
+                        {
+                            MoveRight();
+                        }
+                    }
+                    else if (Y > 0)
+                    {
+                        for _ in stride(from: 0, to: Y, by: 1)
+                        {
+                            MoveLeft();
+                        }
+                    }
+                }
+                else
+                {
+                    if (Y < 0)
+                    {
+                        for _ in stride(from: 0, to: (Y * -1), by: 1)
+                        {
+                            MoveLeft();
+                        }
+                    }
+                    else if (Y > 0)
+                    {
+                        for _ in stride(from: 0, to: Y, by: 1)
+                        {
+                            MoveRight();
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            print("Box not found");
+        }
+        
     }
     private func MoveRight()
     {
@@ -290,6 +641,117 @@ class BoxController
     }
     private func MoveLeft()
     {
+        let step = 1;
         
+        for i in stride(from: 0, to: MovingBoxPool.count, by: 1)
+        {
+            let x = MovingBoxPool[i].getX();
+            let y = MovingBoxPool[i].getY();
+            
+            if (x == mMinX && y < mMaxY!)
+            {
+                MovingBoxPool[i].setY(_y: MovingBoxPool[i].getY() + step);
+                if (MovingBoxPool[i].getX() != MovingBoxPool[i].LastBox?.getX())
+                {
+                    if((mMaxY! - MovingBoxPool[i].getY()) + ((MovingBoxPool[i].LastBox?.getX())! - mMinX!) > mBoxXDistance!)
+                    {
+                        MovingBoxPool[i].setY(_y: (MovingBoxPool[i].LastBox?.getY())! + step);
+                    }
+                }
+                else if (MovingBoxPool[i].getX() == MovingBoxPool[i].LastBox?.getX())
+                {
+                    if(((MovingBoxPool[i].LastBox?.getY())! - MovingBoxPool[i].getY()) > mBoxYDistance!)
+                    {
+                        MovingBoxPool[i].setY(_y: MovingBoxPool[i].getY() + step)
+                    }
+                }
+            }
+            else if (x == mMaxX && y > mMinY!)
+            {
+                MovingBoxPool[i].setY(_y: MovingBoxPool[i].getY() - step);
+                if(MovingBoxPool[i].getX() != MovingBoxPool[i].LastBox?.getX())
+                {
+                    if((mMaxX! - (MovingBoxPool[i].LastBox?.getX())!)+(MovingBoxPool[i].getY() - mMinY!) > mBoxXDistance!)
+                    {
+                        MovingBoxPool[i].setY(_y: MovingBoxPool[i].getY() - step);
+                    }
+                }
+                else if (MovingBoxPool[i].getX() == MovingBoxPool[i].LastBox?.getX())
+                {
+                    if(MovingBoxPool[i].getY() - (MovingBoxPool[i].LastBox?.getY())! > mBoxYDistance!)
+                    {
+                        MovingBoxPool[i].setY(_y: MovingBoxPool[i].getY() - step);
+                    }
+                }
+            }
+            else if (x < mMaxX! && y == mMaxY!)
+            {
+                MovingBoxPool[i].setX(_x: MovingBoxPool[i].getX() + step);
+            }
+            else if (x > mMinX! && y == mMinY!)
+            {
+                MovingBoxPool[i].setX(_x: MovingBoxPool[i].getX() - step);
+            }
+            if ((MovingBoxPool[i].getX() == MovingBoxPool[i].ThisPoint?.LastPoint?.x)&&(MovingBoxPool[i].getY() == (MovingBoxPool[i].ThisPoint?.LastPoint?.y)!))
+            {
+                for j in stride(from: 0, to: MovingBoxPool.count, by: 1)
+                {
+                    if(j != 4)
+                    {
+                        MovingBoxPool[j].ThisPoint = MovingBoxPool[j].ThisPoint?.LastPoint;
+                    }
+                }
+            }
+        }
+    }
+    private func Move(_direction:Int)
+    {
+        if (_direction > 0)
+        {
+            MoveRight();
+        }
+        else if (_direction < 0)
+        {
+            MoveLeft();
+        }
+    }
+    private func forceMove()
+    {
+        if (mForce == 30 || mForce == -30)
+        {
+            mForce = 0;
+            mForceFinished = true;
+        }
+        else
+        {
+            if(abs(mForce) < mForceStepNumber * mForceStep)
+            {
+                mForceStepNumber -= 1;
+            }
+            
+            if (mForce > 0)
+            {
+                for _ in stride(from: 0, to: mForceStepNumber, by: 1)
+                {
+                    Move(_direction: 1);
+                }
+            }
+            else if (mForce < 0)
+            {
+                for _ in stride(from: 0, to: mForceStepNumber, by: 1)
+                {
+                    Move(_direction: -1);
+                }
+            }
+            
+            if(mForce > 0)
+            {
+                mForce = mForce - 1;
+            }
+            else if (mForce < 0)
+            {
+                mForce = mForce + 1;
+            }
+        }
     }
 }

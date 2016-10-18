@@ -62,12 +62,15 @@ class ViewController: UIViewController {
         mBoxController = BoxController(_drawBoxView: drawBox!);
         
         let mLongPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(mInputLongPress(_:)));
+        mLongPressRecognizer.cancelsTouchesInView = false;
         view.addGestureRecognizer(mLongPressRecognizer);
         
         let mTapRecognizer = UITapGestureRecognizer(target: self, action: #selector(mInputTap(_:)));
+        mTapRecognizer.cancelsTouchesInView = false;
         view.addGestureRecognizer(mTapRecognizer);
         
         let mPanRecognizer = UIPanGestureRecognizer(target: self, action: #selector(mInputPan(_:)));
+        mPanRecognizer.cancelsTouchesInView = false;
         view.addGestureRecognizer(mPanRecognizer);
     }
 
