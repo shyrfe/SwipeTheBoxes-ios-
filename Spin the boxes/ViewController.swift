@@ -20,11 +20,15 @@ class ViewController: UIViewController {
     {
         if (gestureRecognizer.state == UIGestureRecognizerState.began)
         {
-            mBoxController?.input(_value: BoxController.INPUT_TYPE_LONGPRESS_START,_recognizer: gestureRecognizer)
+            mBoxController?.input(_value: BoxController.INPUT_TYPE_LONGPRESS_START,_recognizer: gestureRecognizer);
         }
         else if (gestureRecognizer.state == UIGestureRecognizerState.ended)
         {
-            mBoxController?.input(_value: BoxController.INPUT_TYPE_LONGPRESS_END,_recognizer: gestureRecognizer)
+            mBoxController?.input(_value: BoxController.INPUT_TYPE_LONGPRESS_END,_recognizer: gestureRecognizer);
+        }
+        else if (gestureRecognizer.state == UIGestureRecognizerState.failed)
+        {
+            mBoxController?.input(_value: BoxController.INPUT_TYPE_LONGPRESS_END,_recognizer: gestureRecognizer);
         }
     }
     

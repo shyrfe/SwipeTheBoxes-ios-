@@ -29,7 +29,7 @@ class BoxController
     private var mScrollRun = false;
     private var mForceStep = 0;
     private var mForceStepNumber = 0;
-    private var mForceNumberOfSteps = 9;
+    private var mForceNumberOfSteps = 20;
     
     private var mScreenWidth:Int?;
     private var mScreenHeight:Int?;
@@ -269,22 +269,21 @@ class BoxController
         let X = Int(floor(_recognizer.location(in: _recognizer.view).x));// * displayScale;
         let Y = Int(floor(_recognizer.location(in: _recognizer.view).y));// * displayScale;
         
-        let forceX = Int(panVelocity.x);
-        let forceY = Int(panVelocity.y);
+        let forceX = Int(panVelocity.x) / 10;
+        let forceY = Int(panVelocity.y) / 10;
         
         
-        if ((abs(panVelocity.x) > 1500)||(abs(panVelocity.y) > 1500))
+        if ((abs(panVelocity.x) > 800)||(abs(panVelocity.y) > 800)) // swipe
         {
-            //print("Swipe");
             if(abs(Int(_recognizer.translation(in: _recognizer.view).x)) > SWIPE_THRESHOLD)
             {
                 if (Y * displayScale > mScreenHeight! / 2)
                 {
-                    MoveWithForce(_force: (forceX * -1) / 10);
+                    MoveWithForce(_force: (forceX * -1));
                 }
                 else
                 {
-                    MoveWithForce(_force: forceX / 10);
+                    MoveWithForce(_force: forceX);
                 }
                 
             }
@@ -292,16 +291,16 @@ class BoxController
             {
                 if (X * displayScale > mScreenWidth! / 2)
                 {
-                    MoveWithForce(_force: forceY / 10);
+                    MoveWithForce(_force: forceY);
                 }
                 else
                 {
-                    MoveWithForce(_force: (forceY * -1) / 10);
+                    MoveWithForce(_force: (forceY * -1));
                 }
                 
             }
         }
-        else
+        else //scroll
         {
             var distanceX = 0;//Int(floor(_recognizer.translation(in: _recognizer.view).x)) / displayScale;
             var distanceY = 0;//Int(floor(_recognizer.translation(in: _recognizer.view).y)) / displayScale;
@@ -335,7 +334,6 @@ class BoxController
             {
                 print("Tap #" + String(describing: localBox!.getNumber()));
             }
-            
         }
     }
     
@@ -359,15 +357,16 @@ class BoxController
     
     private func MoveWithForce(_force:Int)
     {
+        
         mForce = _force;
         mForceStepNumber = mForceNumberOfSteps;
-        mForceStep = abs(mForce)/mForceNumberOfSteps;
+        mForceStep = abs(mForce) / mForceNumberOfSteps;
         mForceFinished = false;
         
     }
     private func syncPosition()
     {
-        if (abs(mForce) < 100 && !mScrollRun)
+        if (abs(mForce) < mForceStep && !mScrollRun)
         {
             mForce = 0;
             var dir = 0;
@@ -704,13 +703,21 @@ class BoxController
     }
     private func forceMove()
     {
-        if (mForce == 30 || mForce == -30)
+//        print("StepNumber:")
+//        print(mForceStepNumber);
+//        print("Force")
+//        print(mForce)
+//        print("number * force step")
+//        print(mForceStep * mForceStepNumber)
+        //if (mForce == 10 || mForce == -10)
+        if(mForceStepNumber == 1)
         {
             mForce = 0;
             mForceFinished = true;
         }
         else
         {
+            
             if(abs(mForce) < mForceStepNumber * mForceStep)
             {
                 mForceStepNumber -= 1;
@@ -718,14 +725,15 @@ class BoxController
             
             if (mForce > 0)
             {
-                for _ in stride(from: 0, to: mForceStepNumber, by: 1)
+                for _ in stride(from: 0, to: mForceStepNumber * 2 , by: 1)
                 {
+                    //print(i);
                     Move(_direction: 1);
                 }
             }
             else if (mForce < 0)
             {
-                for _ in stride(from: 0, to: mForceStepNumber, by: 1)
+                for _ in stride(from: 0, to: mForceStepNumber * 2, by: 1)
                 {
                     Move(_direction: -1);
                 }
