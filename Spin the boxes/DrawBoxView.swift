@@ -148,15 +148,18 @@ class DrawBoxView: UIView {
         context.setStrokeColor(UIColor.black.cgColor);
         //context.setLineWidth(CGFloat.init(integerLiteral: 2));
         context.stroke(rect, width: CGFloat.init(integerLiteral: 1));
+        if (box.getNumber() != -1)
+        {
+            let fontSize:CGFloat = 9.0;
+            let text:NSString = NSString.localizedStringWithFormat("%d", box.getNumber());
+            let font = UIFont(name:"Helvetica",size: fontSize);
+            let textRect: CGRect = CGRect.init(x: box.getX() / displayScale, y: (box.getY() / displayScale)+((boxHeight/displayScale)/2)-Int(fontSize)/2, width: boxWidth / displayScale, height: boxHeight / displayScale);
+            let paragraph = NSMutableParagraphStyle();
+            paragraph.alignment = .center;
+            let textFontAttributes = [NSFontAttributeName: font!, NSParagraphStyleAttributeName: paragraph];
+            text.draw(in: textRect, withAttributes: textFontAttributes);
+        }
         
-        let fontSize:CGFloat = 9.0;
-        let text:NSString = NSString.localizedStringWithFormat("%d", box.getNumber());
-        let font = UIFont(name:"Helvetica",size: fontSize);
-        let textRect: CGRect = CGRect.init(x: box.getX() / displayScale, y: (box.getY() / displayScale)+((boxHeight/displayScale)/2)-Int(fontSize)/2, width: boxWidth / displayScale, height: boxHeight / displayScale);
-        let paragraph = NSMutableParagraphStyle();
-        paragraph.alignment = .center;
-        let textFontAttributes = [NSFontAttributeName: font!, NSParagraphStyleAttributeName: paragraph];
-        text.draw(in: textRect, withAttributes: textFontAttributes);
         
         
         //context.setFont(CGFont.init("Helvetica" as CFString)!);

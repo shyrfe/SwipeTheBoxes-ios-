@@ -47,6 +47,7 @@ class BoxController
     private var mFirstTouchPositionX = 0;
     private var mFirstTouchPositionY = 0;
     
+    private var mLongPressNumber:Int?;
     
     let mDrawBoxView:DrawBoxView;
     
@@ -195,26 +196,27 @@ class BoxController
             //print("X: " + String.init(describing: _recognizer.location(in: _recognizer.view).x));
             break;
         case "LongPressEnd":
-            print("LongPressEnd")
+            longPressEndInput(_recognizer: _recognizer as! UILongPressGestureRecognizer);
+            //print("LongPressEnd")
             break;
         case "Tap":
-            print("Tap")
+            //print("Tap")
+            tapInput(_recognizer: _recognizer as! UITapGestureRecognizer)
             break;
         //case "Swipe":
             //print("Swipe")
             //break;
         case "Pan":
             panInput(_recognizer: _recognizer as! UIPanGestureRecognizer);
-            //print("Pan")
             break;
         case "TouchBegan":
-            print("TouchBegan");
+            //print("TouchBegan");
             mForce = 0;
             mForceFinished = true;
             mScrollRun = true;
             break;
         case "TouchEnded":
-            print("TouchEnded");
+            //print("TouchEnded");
             mScrollRun = false;
             break;
         case "TouchMoved":
@@ -229,7 +231,8 @@ class BoxController
         localBox = findBox(_x: Int(_recognizer.location(in: _recognizer.view).x), _y: Int(_recognizer.location(in: _recognizer.view).y));
         if (localBox != nil)
         {
-            print("LongPress Start #" + String.init(describing: localBox?.getNumber()));
+            mLongPressNumber = localBox?.getNumber();
+            print("LongPress Start #" + String.init(describing: localBox!.getNumber()));
         }
         else
         {
@@ -237,8 +240,17 @@ class BoxController
         }
         
     }
+    private func longPressEndInput(_recognizer:UILongPressGestureRecognizer)
+    {
+        if(mLongPressNumber != nil)
+        {
+            print("LongPress End #" + String(mLongPressNumber!));
+            mLongPressNumber = nil;
+        }
+    }
     private func panInput(_recognizer:UIPanGestureRecognizer)
     {
+        let SWIPE_THRESHOLD = 50;
         let panVelocity = _recognizer.velocity(in: _recognizer.view);
         
         var displayScale = 1;
@@ -257,11 +269,37 @@ class BoxController
         let X = Int(floor(_recognizer.location(in: _recognizer.view).x));// * displayScale;
         let Y = Int(floor(_recognizer.location(in: _recognizer.view).y));// * displayScale;
         
+        let forceX = Int(panVelocity.x);
+        let forceY = Int(panVelocity.y);
         
-        if ((abs(panVelocity.x) > 2000)||(abs(panVelocity.y) > 2000))
+        
+        if ((abs(panVelocity.x) > 1500)||(abs(panVelocity.y) > 1500))
         {
-            print("Swipe");
-            
+            //print("Swipe");
+            if(abs(Int(_recognizer.translation(in: _recognizer.view).x)) > SWIPE_THRESHOLD)
+            {
+                if (Y * displayScale > mScreenHeight! / 2)
+                {
+                    MoveWithForce(_force: (forceX * -1) / 10);
+                }
+                else
+                {
+                    MoveWithForce(_force: forceX / 10);
+                }
+                
+            }
+            else if (abs(Int(_recognizer.translation(in: _recognizer.view).y)) > SWIPE_THRESHOLD)
+            {
+                if (X * displayScale > mScreenWidth! / 2)
+                {
+                    MoveWithForce(_force: forceY / 10);
+                }
+                else
+                {
+                    MoveWithForce(_force: (forceY * -1) / 10);
+                }
+                
+            }
         }
         else
         {
@@ -282,66 +320,23 @@ class BoxController
                 mFirstTouchPositionY = Int(floor(_recognizer.location(in: _recognizer.view).y)) * displayScale;
             }
             
-            
             MoveTo(_box: findBox(_x: X, _y: Y), _distX: distanceX, _distY: distanceY);
-//            if (abs(panVelocity.x) > abs(panVelocity.y))
-//            {
-//                if (panVelocity.x > 0)
-//                {
-//                    if(Y < mScreenHeight!/2)
-//                    {
-//                        print("Y < H/2")
-//                        MoveTo(_box: findBox(_x: X, _y: Y), _distX: distanceX, _distY: distanceY);
-//                    }
-//                    else
-//                    {
-//                        print("Y > H/2")
-//                        MoveTo(_box: findBox(_x: X, _y: Y), _distX: distanceX, _distY: distanceY);
-//                    }
-//                }
-//                else
-//                {
-//                    if(Y > mScreenHeight!/2)
-//                    {
-//                        MoveTo(_box: findBox(_x: X, _y: Y), _distX: distanceX, _distY: distanceY);
-//                    }
-//                    else
-//                    {
-//                        MoveTo(_box: findBox(_x: X, _y: Y), _distX: distanceX, _distY: distanceY)
-//                    }
-//                }
-//            }
-//            else
-//            {
-//                if (panVelocity.y > 0)
-//                {
-//                    if(X > mScreenWidth!/2)
-//                    {
-//                        MoveTo(_box: findBox(_x: X, _y: Y), _distX: distanceX, _distY: distanceY);
-//                    }
-//                    else
-//                    {
-//                        MoveTo(_box: findBox(_x: X, _y: Y), _distX: distanceX, _distY: distanceY);
-//                    }
-//                }
-//                else
-//                {
-//                    if(X < mScreenWidth!/2)
-//                    {
-//                        MoveTo(_box: findBox(_x: X, _y: Y), _distX: distanceX, _distY: distanceY);
-//                    }
-//                    else
-//                    {
-//                        MoveTo(_box: findBox(_x: X, _y: Y), _distX: distanceX, _distY: distanceY);
-//                    }
-//                }
-//            }
-            //MoveWithForce(_force: 1000);
-            //MoveRight();
-            //MoveLeft();
-            //print("Pan");
         }
     
+    }
+    private func tapInput(_recognizer:UITapGestureRecognizer)
+    {
+        var localBox:Box?;
+        localBox = findBox(_x: Int(_recognizer.location(in: _recognizer.view).x),
+                           _y: Int(_recognizer.location(in: _recognizer.view).y));
+        if (localBox != nil)
+        {
+            if((localBox?.getNumber())! >= 0)
+            {
+                print("Tap #" + String(describing: localBox!.getNumber()));
+            }
+            
+        }
     }
     
     func animationUpdate()
@@ -354,14 +349,6 @@ class BoxController
         let time = Date().timeIntervalSince1970;
         let dTime = (time - mLastTime);
         
-//        for _ in 0...30
-//        {
-//            MoveLeft();
-//            MoveRight();
-//            MoveLeft();
-//            MoveRight();
-//            MoveRight();
-//        }
         if (dTime >= 1/60)
         {
             forceMove();
@@ -484,8 +471,8 @@ class BoxController
         let X = _distX;
         let Y = _distY;
         
-        print("DistX" + String.init(X));
-        print("DistY" + String.init(Y));
+        //print("DistX" + String.init(X));
+        //print("DistY" + String.init(Y));
         var LocalBox:Box?;
         LocalBox = _box;
         
@@ -754,4 +741,5 @@ class BoxController
             }
         }
     }
+    
 }
