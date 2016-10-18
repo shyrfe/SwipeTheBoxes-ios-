@@ -53,6 +53,7 @@ class BoxController
     
     init(_drawBoxView:DrawBoxView)
     {
+        
         mDrawBoxView = _drawBoxView;
 
         let thread = Thread(target: self, selector: #selector(boxsInit), object: nil);
@@ -340,6 +341,7 @@ class BoxController
             //MoveLeft();
             //print("Pan");
         }
+    
     }
     
     func animationUpdate()
@@ -498,7 +500,6 @@ class BoxController
                         for _ in stride(from: 0, to: (X * -1), by: 1)
                         {
                             MoveLeft();
-                            
                         }
                     }
                     else if (X > 0)
@@ -523,7 +524,6 @@ class BoxController
                         for _ in stride(from: 0, to: X, by: 1)
                         {
                             MoveLeft();
-                            
                         }
                     }
                 }
@@ -655,7 +655,7 @@ class BoxController
                 {
                     if((mMaxY! - MovingBoxPool[i].getY()) + ((MovingBoxPool[i].LastBox?.getX())! - mMinX!) > mBoxXDistance!)
                     {
-                        MovingBoxPool[i].setY(_y: (MovingBoxPool[i].LastBox?.getY())! + step);
+                        MovingBoxPool[i].setY(_y: (MovingBoxPool[i].getY()) + step);
                     }
                 }
                 else if (MovingBoxPool[i].getX() == MovingBoxPool[i].LastBox?.getX())
