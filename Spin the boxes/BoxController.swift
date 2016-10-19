@@ -273,7 +273,7 @@ class BoxController
         let forceY = Int(panVelocity.y) / 10;
         
         
-        if ((abs(panVelocity.x) > 900)||(abs(panVelocity.y) > 900)) // swipe
+        if ((abs(panVelocity.x) > 1200)||(abs(panVelocity.y) > 1200)) // swipe
         {
             if(abs(Int(_recognizer.translation(in: _recognizer.view).x)) > SWIPE_THRESHOLD)
             {
@@ -554,7 +554,7 @@ class BoxController
         }
         else
         {
-            print("Box not found");
+            //print("Box not found");
         }
         
     }
